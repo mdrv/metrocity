@@ -30,7 +30,7 @@ Built with [Rust](https://www.rust-lang.org/), [Ratatui](https://ratatui.rs/), [
 - **Pixel-art sprites** rendered over the character grid via the Kitty graphics protocol
 - **Distro detection** - renders your distro's logo on a building
 - **6 built-in color themes** plus custom themes via TOML
-- **Shell integration** for zsh, bash and fish - activates automatically on idle
+- **Shell integration** for zsh, bash, fish and nushell - activates automatically on idle
 - **Instant exit** - any keypress restores your terminal exactly as it was
 - **Tiny** - ~1.4MB release binary, no runtime dependencies
 
@@ -68,6 +68,10 @@ paru -S metrocity
 
 ## Setup
 
+### Manual launch
+
+Just run `metrocity` - it takes over the terminal, press any key to exit.
+
 ### Zsh
 
 Add to your `~/.zshrc`:
@@ -98,18 +102,35 @@ set -gx METROCITY_SCENE cafe
 metrocity shell-init fish | source
 ```
 
-`METROCITY_SCENE` is optional. If unset, metrocity uses the default scene (`cafe`). Set it to `city` for the cyberpunk skyline.
+### Nushell
 
+Requires **Python 3**. First generate the snippet file:
+
+```bash
+metrocity shell-init nushell | save -f ($nu.default-config-dir | path join "metrocity.nu")
+```
+
+Then add to your `~/.config/nushell/config.nu`:
+
+```nu
+$env.METROCITY_TIMEOUT = 120
+$env.METROCITY_SCENE = "cafe"
+source ($nu.default-config-dir | path join "metrocity.nu")
+```
+
+A helper script (`metrocity-helper.py`) is auto-installed to your config directory.
+It joins the shell's foreground process group so metrocity can read keyboard input
+— a workaround for Nushell's [background-process model](https://github.com/nushell/nushell/issues/11402).
+
+---
+
+**Note:** `METROCITY_SCENE` is optional. If unset, metrocity uses the default scene (`cafe`). Set it to `city` for the cyberpunk skyline.
 
 > **Add these lines to your shell config file, not just the current terminal.**
 > `eval` (or `| source` in fish) only affects the shell that runs it, so pasting
 > it into one terminal activates metrocity there only. Put it in `~/.zshrc` /
-> `~/.bashrc` / `~/.config/fish/config.fish`, then open a new terminal (or
+> `~/.bashrc` / `~/.config/fish/config.fish` / `~/.config/nushell/config.nu`, then open a new terminal (or
 > re-source the file) so every shell picks it up.
-
-### Manual launch
-
-Just run `metrocity` - it takes over the terminal, press any key to exit.
 
 ## Usage
 
@@ -123,6 +144,7 @@ metrocity --fps 60                     # Target frame rate
 metrocity shell-init zsh               # Print zsh integration snippet
 metrocity shell-init bash              # Print bash integration snippet
 metrocity shell-init fish              # Print fish integration snippet
+metrocity shell-init nushell           # Print nushell integration snippet
 
 metrocity list scenes                  # List available scenes
 metrocity list themes                  # List available themes
